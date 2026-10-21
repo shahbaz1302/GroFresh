@@ -76,9 +76,7 @@ const EditRoleMobile = () => {
           throw new Error("Invalid admin check response");
         }
         setVisibleRoles(
-          data.adminExist
-            ? roles.filter((role) => role.id !== "admin")
-            : roles,
+          data.adminExist ? roles.filter((role) => role.id !== "admin") : roles,
         );
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -113,15 +111,6 @@ const EditRoleMobile = () => {
         transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
         className="relative w-full max-w-lg overflow-hidden rounded-4xl border border-white/80 bg-white/80 p-6 shadow-[0_30px_90px_-35px_rgba(24,59,43,0.4)] backdrop-blur-xl sm:p-9">
         <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#9ccf73,#d7eb8f,#7ea961)]" />
-
-        {/* <div className="flex items-center justify-between gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#eaf5dc,#dfeec8)] text-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_22px_-10px_rgba(121,167,95,0.8)]" aria-hidden="true">
-            🌱
-          </div>
-          <div className="rounded-full border border-[#dfe8d8] bg-[#f4f8f1] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#54715a]">
-            One last step
-          </div>
-        </div> */}
 
         <div className="mt-3 text-center">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#86a373]">

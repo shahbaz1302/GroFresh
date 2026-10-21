@@ -252,16 +252,6 @@ const Navbar = ({ user }: { user: IUser }) => {
             {/* Nav links */}
             <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
               <Link
-                href="/"
-                onClick={() => setOpenSideBar(false)}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#526557] transition hover:bg-[#f5f9f1] hover:text-[#284936] focus-visible:outline-2 focus-visible:outline-[#76a85b]">
-                <LayoutDashboard
-                  aria-hidden="true"
-                  className="h-4.5 w-4.5 shrink-0 text-[#76a85b]"
-                />
-                <span>Dashboard</span>
-              </Link>
-              <Link
                 href="/add-grocery"
                 onClick={() => setOpenSideBar(false)}
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#526557] transition hover:bg-[#f5f9f1] hover:text-[#284936] focus-visible:outline-2 focus-visible:outline-[#76a85b]">
@@ -572,15 +562,6 @@ const Navbar = ({ user }: { user: IUser }) => {
                   aria-label="Admin navigation"
                   className="hidden items-center gap-1.5 sm:flex">
                   <Link
-                    href="/"
-                    className="flex items-center gap-2 rounded-full border border-[#e8eee3] bg-white px-3.5 py-2 text-sm font-semibold text-[#426e3f] transition hover:border-[#d3e2ca] hover:bg-[#f5f9f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#76a85b]">
-                    <LayoutDashboard
-                      aria-hidden="true"
-                      className="h-4 w-4 shrink-0"
-                    />
-                    <span className="hidden lg:inline">Dashboard</span>
-                  </Link>
-                  <Link
                     href="/add-grocery"
                     className="flex items-center gap-2 rounded-full border border-[#e8eee3] bg-white px-3.5 py-2 text-sm font-semibold text-[#426e3f] transition hover:border-[#d3e2ca] hover:bg-[#f5f9f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#76a85b]">
                     <PlusCircle
@@ -689,7 +670,10 @@ const Navbar = ({ user }: { user: IUser }) => {
                         role="menuitem"
                         onClick={() => setOpen(false)}
                         className="mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#526557] transition hover:bg-[#f5f9f1] hover:text-[#284936] focus-visible:outline-2 focus-visible:outline-[#76a85b]">
-                        <LayoutDashboard aria-hidden="true" className="h-4.5 w-4.5" />
+                        <LayoutDashboard
+                          aria-hidden="true"
+                          className="h-4.5 w-4.5"
+                        />
                         Admin Dashboard
                       </Link>
                     )}

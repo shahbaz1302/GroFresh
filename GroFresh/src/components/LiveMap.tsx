@@ -192,7 +192,7 @@ const LiveMap = ({
     className ||
     "relative w-full h-72 sm:h-80 rounded-2xl overflow-hidden border border-[#dce8d4] shadow-inner";
 
-  return <div ref={containerRef} className={containerClass} />;
+  return <div ref={containerRef} className={containerClass} style={{ isolation: "isolate" }} />;
 };
 
 export default LiveMap;

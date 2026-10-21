@@ -4,7 +4,6 @@ import { getSocket } from "@/lib/socket";
 import axios from "axios";
 import {
   Activity,
-  AlertCircle,
   ArrowUpRight,
   Boxes,
   CheckCircle2,
@@ -12,8 +11,6 @@ import {
   Clock,
   Copy,
   CreditCard,
-  DollarSign,
-  Download,
   ExternalLink,
   Flame,
   IndianRupee,
@@ -27,12 +24,8 @@ import {
   Search,
   ShoppingBag,
   Sparkles,
-  TrendingDown,
   TrendingUp,
   Truck,
-  Users,
-  Volume2,
-  VolumeX,
   Wallet,
   XCircle,
 } from "lucide-react";
@@ -146,7 +139,7 @@ const AdminDashboard = () => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [chartMode, setChartMode] = useState<"revenue" | "orders">("revenue");
-  const [soundEnabled, setSoundEnabled] = useState(true);
+
   const [searchOrderQuery, setSearchOrderQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(
@@ -154,34 +147,6 @@ const AdminDashboard = () => {
   );
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date>(new Date());
 
-  // Web Audio Chime synthesizer for new orders
-  const playSoundChime = useCallback(() => {
-    if (!soundEnabled || typeof window === "undefined") return;
-    try {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext;
-      const ctx = new AudioCtx();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
-
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start();
-      osc.stop(ctx.currentTime + 0.45);
-    } catch {
-      // Audio playback might be restricted before first gesture
-    }
-  }, [soundEnabled]);
 
   // Fetch stats from backend API
   const fetchDashboardStats = useCallback(async (isManualRefresh = false) => {
@@ -233,7 +198,6 @@ const AdminDashboard = () => {
 
     // Event 1: New order placed by customer
     const handleNewOrder = (newOrderData: any) => {
-      playSoundChime();
       const orderAmount = Number(newOrderData.totalAmount) || 0;
       const orderId = newOrderData._id || `ORD-${Date.now()}`;
       const customerName =
@@ -362,11 +326,11 @@ const AdminDashboard = () => {
       // Add to live events ticker
       const statusTitle =
         newStatus === "outForDelivery"
-          ? "🚚 Order Dispatched"
+          ? "Order Dispatched"
           : newStatus === "delivered"
-            ? "✅ Order Delivered"
+            ? "Order Delivered"
             : newStatus === "cancelled"
-              ? "❌ Order Cancelled"
+              ? "Order Cancelled"
               : "Order Status Updated";
 
       setLiveEvents((prev) => [
@@ -411,7 +375,7 @@ const AdminDashboard = () => {
       socket.off("order-status-updated", handleStatusUpdate);
       socket.off("update-deliveryBoy-location", handleFleetLocation);
     };
-  }, [fetchDashboardStats, playSoundChime]);
+  }, [fetchDashboardStats]);
 
   // Compute active metrics based on timeFilter
   const activeMetrics = useMemo(() => {
@@ -485,51 +449,6 @@ const AdminDashboard = () => {
     });
   }, [recentOrders, searchOrderQuery, statusFilter]);
 
-  // CSV Report Exporter
-  const exportToCSV = () => {
-    if (!recentOrders.length) {
-      toast.error("No order data available to export");
-      return;
-    }
-
-    const headers = [
-      "Order ID",
-      "Customer",
-      "City",
-      "Total Amount (INR)",
-      "Status",
-      "Payment Method",
-      "Paid",
-      "Date",
-    ];
-
-    const rows = recentOrders.map((o) => [
-      o._id,
-      `"${o.customerName}"`,
-      `"${o.deliveryCity || "N/A"}"`,
-      o.totalAmount,
-      o.status,
-      o.paymentMethod,
-      o.isPaid ? "Yes" : "No",
-      new Date(o.createdAt).toLocaleString("en-IN"),
-    ]);
-
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `GroFresh_Admin_Report_${new Date().toISOString().slice(0, 10)}.csv`,
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("Orders report exported as CSV!");
-  };
 
   // SVG Chart Calculations for 7-day trend
   const chartData = useMemo(() => {
@@ -641,33 +560,6 @@ const AdminDashboard = () => {
               </span>
             </div>
 
-            {/* Audio Alert Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                setSoundEnabled((v) => !v);
-                toast(
-                  soundEnabled ? "Audio alerts muted" : "Audio alerts enabled!",
-                  { icon: soundEnabled ? "🔇" : "🔔" },
-                );
-              }}
-              aria-label={
-                soundEnabled
-                  ? "Mute order sound alerts"
-                  : "Unmute order sound alerts"
-              }
-              className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${
-                soundEnabled
-                  ? "border-[#dcebd0] bg-white text-[#426e3f] hover:bg-[#f5f9f1]"
-                  : "border-[#e0e4dd] bg-[#f2f4f0] text-[#838d82] hover:bg-white"
-              }`}>
-              {soundEnabled ? (
-                <Volume2 className="h-4.5 w-4.5" />
-              ) : (
-                <VolumeX className="h-4.5 w-4.5" />
-              )}
-            </button>
-
             {/* Sync Refresh Button */}
             <button
               type="button"
@@ -680,15 +572,6 @@ const AdminDashboard = () => {
               <span className="hidden sm:inline">
                 {refreshing ? "Syncing..." : "Sync Data"}
               </span>
-            </button>
-
-            {/* Export CSV Report */}
-            <button
-              type="button"
-              onClick={exportToCSV}
-              className="flex items-center gap-2 rounded-full border border-[#dcebd0] bg-white px-3.5 py-2 text-xs font-bold text-[#426e3f] shadow-sm transition hover:border-[#b8d4a5] hover:bg-[#f5f9f1] active:scale-95">
-              <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Export CSV</span>
             </button>
 
             {/* Quick Link to Manage Orders */}
