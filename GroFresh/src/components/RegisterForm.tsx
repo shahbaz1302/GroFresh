@@ -48,9 +48,20 @@ export default function RegisterForm({ previousStep }: RegisterFormProps) {
         email: formData.email,
         password: formData.password,
       });
+      // Automatically sign in after registration
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+      if (!result?.ok || result.error) {
+        toast.success("Account created! Please sign in.");
+        router.push("/login");
+        return;
+      }
       toast.success("Account created successfully!");
       setFormData({ name: "", email: "", password: "" });
-      router.push("/login");
+      router.push("/");
     } catch (error) {
       if (
         axios.isAxiosError<{ message?: string }>(error) &&
