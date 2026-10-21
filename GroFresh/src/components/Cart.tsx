@@ -23,7 +23,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
   const { cartData, subTotal, deliveryFee, totalAmount } = useSelector(
     (state: RootState) => state.cart,
   );
-  const userData = useSelector((state: RootState) => state.user.userData);
+  const { userData } = useSelector((state: RootState) => state.user);
   const itemCount = cartData.reduce((total, item) => total + item.quantity, 0);
 
   useEffect(() => {
