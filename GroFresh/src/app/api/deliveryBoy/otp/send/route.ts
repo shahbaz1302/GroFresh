@@ -1,5 +1,6 @@
 import connectDB from "@/lib/db";
 import { sendMail } from "@/lib/mail";
+import { generateOtpEmailHtml } from "@/lib/otpEmail";
 import orderModel from "@/models/order.model";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,8 +17,8 @@ export async function POST(request: NextRequest) {
     await order.save();
     await sendMail(
       order.userId.email,
-      "Delivery OTP",
-      `<h2>Your delivery otp is <strong>${otp}</strong></h2>`,
+      "GroFresh — Your Delivery OTP",
+      generateOtpEmailHtml(otp, orderId),
     );
     return NextResponse.json(
       { message: "OTP send successfully" },
