@@ -850,7 +850,7 @@ export default function OrdersClient({
 
                           {/* Delivery Address & Summary */}
                           <div className="space-y-4">
-                            {order.assignedDeliveryBoy && (
+                            {order.assignedDeliveryBoy && order.status !== "delivered" && (
                               <>
                                 <div className="rounded-2xl border border-[#dce8d4] bg-[#f5faf1] p-4">
                                   <h4 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-[#66805f]">
