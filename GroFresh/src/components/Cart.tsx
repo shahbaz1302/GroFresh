@@ -234,7 +234,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                   Inclusive of all applicable charges.
                 </p>
                 <Link
-                  href={userData ? "/checkout" : "/login"}
+                  href="/checkout"
                   onClick={onClose}
                   className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#547d46] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#3f6535] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/70">
                   Proceed to checkout
