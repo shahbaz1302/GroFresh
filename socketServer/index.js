@@ -65,6 +65,10 @@ app.post("/notify", (req, res) => {
   return res.status(200).json({ success: true });
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ success: true, message: "Socket server is running" });
+});
+
 server.listen(port, () => {
   console.log("Socket server running on port", port);
 });
