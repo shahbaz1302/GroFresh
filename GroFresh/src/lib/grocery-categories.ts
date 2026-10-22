@@ -39,12 +39,12 @@ export const CATEGORY_SUBCATEGORIES: Record<
     { value: "milkshakes", label: "Milkshakes" },
   ],
   "Snacks & Munchies": [
-    { value: "snacks", label: "Snacks" },
-    { value: "munchies", label: "Munchies" },
-    { value: "chips-namkeen", label: "Chips & Namkeen" },
+    { value: "chips", label: "Chips" },
+    { value: "namkeen-mixtures", label: "Namkeen & Mixtures" },
+    { value: "energy-bars", label: "Energy Bars" },
+    { value: "wafers", label: "Wafers" },
     { value: "biscuits-cookies", label: "Biscuits & Cookies" },
     { value: "chocolates-candies", label: "Chocolates & Candies" },
-    { value: "nuts-seeds", label: "Nuts & Seeds" },
   ],
   "Cold Drinks & Beverages": [
     { value: "colddrinks", label: "Cold Drinks" },
