@@ -239,10 +239,9 @@ const CheckoutPage = () => {
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full px-2 py-2 text-sm font-semibold text-[#66776a] transition hover:text-[#294b35] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]">
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dce8d4] bg-white px-3.5 py-2 text-xs font-semibold text-[#547d46] shadow-xs transition hover:border-[#b6cda8] hover:bg-[#f8fbf5] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/60 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
             <ArrowLeft aria-hidden="true" className="h-4 w-4" />
             <span className="hidden sm:inline">Back to shopping</span>
-            <span className="sm:hidden">Back</span>
           </button>
 
           <Link

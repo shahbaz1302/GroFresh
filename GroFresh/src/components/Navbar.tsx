@@ -23,8 +23,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -94,6 +94,37 @@ const Navbar = ({ user }: { user: IUser }) => {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
+
+  const adminNavItems = useMemo(
+    () => [
+      {
+        href: "/",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        isActive: pathname === "/" || pathname === "/admin-dashboard",
+      },
+      {
+        href: "/add-grocery",
+        label: "Add Grocery",
+        icon: PlusCircle,
+        isActive: pathname === "/add-grocery",
+      },
+      {
+        href: "/groceries",
+        label: "View Grocery",
+        icon: Boxes,
+        isActive: pathname === "/groceries",
+      },
+      {
+        href: "/manage-orders",
+        label: "Manage Orders",
+        icon: ClipboardCheck,
+        isActive: pathname === "/manage-orders",
+      },
+    ],
+    [pathname],
+  );
 
   // Debounced search effect
   useEffect(() => {
@@ -251,36 +282,28 @@ const Navbar = ({ user }: { user: IUser }) => {
 
             {/* Nav links */}
             <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
-              <Link
-                href="/add-grocery"
-                onClick={() => setOpenSideBar(false)}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#526557] transition hover:bg-[#f5f9f1] hover:text-[#284936] focus-visible:outline-2 focus-visible:outline-[#76a85b]">
-                <PlusCircle
-                  aria-hidden="true"
-                  className="h-4.5 w-4.5 shrink-0 text-[#76a85b]"
-                />
-                <span>Add Grocery</span>
-              </Link>
-              <Link
-                href="/groceries"
-                onClick={() => setOpenSideBar(false)}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#526557] transition hover:bg-[#f5f9f1] hover:text-[#284936] focus-visible:outline-2 focus-visible:outline-[#76a85b]">
-                <Boxes
-                  aria-hidden="true"
-                  className="h-4.5 w-4.5 shrink-0 text-[#76a85b]"
-                />
-                <span>View Grocery</span>
-              </Link>
-              <Link
-                href="/manage-orders"
-                onClick={() => setOpenSideBar(false)}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#526557] transition hover:bg-[#f5f9f1] hover:text-[#284936] focus-visible:outline-2 focus-visible:outline-[#76a85b]">
-                <ClipboardCheck
-                  aria-hidden="true"
-                  className="h-4.5 w-4.5 shrink-0 text-[#76a85b]"
-                />
-                <span>Manage Orders</span>
-              </Link>
+              {adminNavItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpenSideBar(false)}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-[#76a85b] ${
+                      item.isActive
+                        ? "bg-[#eaf3e3] font-bold text-[#284936]"
+                        : "text-[#526557] hover:bg-[#f5f9f1] hover:text-[#284936]"
+                    }`}>
+                    <Icon
+                      aria-hidden="true"
+                      className={`h-4.5 w-4.5 shrink-0 ${
+                        item.isActive ? "text-[#3f6535]" : "text-[#76a85b]"
+                      }`}
+                    />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Logout */}
@@ -561,30 +584,27 @@ const Navbar = ({ user }: { user: IUser }) => {
                 <nav
                   aria-label="Admin navigation"
                   className="hidden items-center gap-1.5 sm:flex">
-                  <Link
-                    href="/add-grocery"
-                    className="flex items-center gap-2 rounded-full border border-[#e8eee3] bg-white px-3.5 py-2 text-sm font-semibold text-[#426e3f] transition hover:border-[#d3e2ca] hover:bg-[#f5f9f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#76a85b]">
-                    <PlusCircle
-                      aria-hidden="true"
-                      className="h-4 w-4 shrink-0"
-                    />
-                    <span className="hidden lg:inline">Add Grocery</span>
-                  </Link>
-                  <Link
-                    href="/groceries"
-                    className="flex items-center gap-2 rounded-full border border-[#e8eee3] bg-white px-3.5 py-2 text-sm font-semibold text-[#426e3f] transition hover:border-[#d3e2ca] hover:bg-[#f5f9f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#76a85b]">
-                    <Boxes aria-hidden="true" className="h-4 w-4 shrink-0" />
-                    <span className="hidden lg:inline">View Grocery</span>
-                  </Link>
-                  <Link
-                    href="/manage-orders"
-                    className="flex items-center gap-2 rounded-full border border-[#e8eee3] bg-white px-3.5 py-2 text-sm font-semibold text-[#426e3f] transition hover:border-[#d3e2ca] hover:bg-[#f5f9f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#76a85b]">
-                    <ClipboardCheck
-                      aria-hidden="true"
-                      className="h-4 w-4 shrink-0"
-                    />
-                    <span className="hidden lg:inline">Manage Orders</span>
-                  </Link>
+                  {adminNavItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#76a85b] ${
+                          item.isActive
+                            ? "border-[#284936] bg-[#284936] text-white shadow-xs"
+                            : "border-[#e8eee3] bg-white text-[#426e3f] hover:border-[#d3e2ca] hover:bg-[#f5f9f1]"
+                        }`}>
+                        <Icon
+                          aria-hidden="true"
+                          className={`h-4 w-4 shrink-0 ${
+                            item.isActive ? "text-[#a8d591]" : "text-[#76a85b]"
+                          }`}
+                        />
+                        <span className="hidden md:inline">{item.label}</span>
+                      </Link>
+                    );
+                  })}
                 </nav>
                 <button
                   type="button"

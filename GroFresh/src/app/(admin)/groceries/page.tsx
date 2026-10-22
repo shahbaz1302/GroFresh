@@ -4,6 +4,8 @@ import {
   ArrowLeft,
   Boxes,
   CheckCircle,
+  ChevronLeft,
+  ChevronRight,
   ImagePlus,
   Loader2,
   Pencil,
@@ -39,12 +41,15 @@ type Grocery = {
 
 type GroceryResponse = { groceries?: Grocery[]; message?: string };
 
+const ITEMS_PER_PAGE = 12;
+
 const ViewGrocery = () => {
   const [groceries, setGroceries] = useState<Grocery[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All categories");
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [editingGrocery, setEditingGrocery] = useState<Grocery | null>(null);
   const [editName, setEditName] = useState("");
@@ -109,6 +114,26 @@ const ViewGrocery = () => {
       return matchesSearch && matchesCategory;
     });
   }, [category, groceries, search]);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, category]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredGroceries.length / ITEMS_PER_PAGE),
+  );
+  const paginatedGroceries = filteredGroceries.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // Show at most 5 page numbers around current page
+  const visiblePages = pageNumbers.filter(
+    (p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1,
+  );
 
   const handleOpenEdit = (grocery: Grocery) => {
     setEditingGrocery(grocery);
@@ -381,11 +406,21 @@ const ViewGrocery = () => {
           ) : filteredGroceries.length > 0 ? (
             <>
               <p className="mb-4 text-xs font-medium text-[#82967b]">
-                Showing {filteredGroceries.length} of {groceries.length}{" "}
-                {groceries.length === 1 ? "product" : "products"}
+                Showing{" "}
+                {Math.min(
+                  (currentPage - 1) * ITEMS_PER_PAGE + 1,
+                  filteredGroceries.length,
+                )}
+                –
+                {Math.min(
+                  currentPage * ITEMS_PER_PAGE,
+                  filteredGroceries.length,
+                )}{" "}
+                of {filteredGroceries.length}{" "}
+                {filteredGroceries.length === 1 ? "product" : "products"}
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredGroceries.map((grocery) => (
+                {paginatedGroceries.map((grocery) => (
                   <article
                     key={grocery._id}
                     className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#e9eee5] bg-white transition duration-200 hover:-translate-y-0.5 hover:border-[#c5d9b8] hover:shadow-[0_12px_30px_-16px_rgba(24,59,43,0.28)]">
@@ -455,6 +490,75 @@ const ViewGrocery = () => {
                   </article>
                 ))}
               </div>
+
+              {/* ── Pagination ── */}
+              {totalPages > 1 && (
+                <nav
+                  aria-label="Pagination"
+                  className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  {/* Result info */}
+                  <p className="text-xs font-medium text-[#82967b]">
+                    Page {currentPage} of {totalPages}
+                  </p>
+
+                  {/* Page buttons */}
+                  <div className="flex items-center gap-1.5">
+                    {/* Prev */}
+                    <button
+                      type="button"
+                      id="pagination-prev"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      aria-label="Previous page"
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e5ecdf] bg-white text-[#547d46] shadow-xs transition hover:border-[#b6cda8] hover:bg-[#f8fbf5] disabled:cursor-not-allowed disabled:opacity-40">
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+
+                    {visiblePages.map((page, idx) => {
+                      const prevPage = visiblePages[idx - 1];
+                      const showEllipsisBefore =
+                        prevPage !== undefined && page - prevPage > 1;
+                      return (
+                        <span key={page} className="flex items-center gap-1.5">
+                          {showEllipsisBefore && (
+                            <span className="flex h-9 w-6 items-center justify-center text-xs font-medium text-[#82967b]">
+                              …
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            id={`pagination-page-${page}`}
+                            onClick={() => setCurrentPage(page)}
+                            aria-current={
+                              currentPage === page ? "page" : undefined
+                            }
+                            aria-label={`Go to page ${page}`}
+                            className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition ${
+                              currentPage === page
+                                ? "bg-[#183b2b] text-white shadow-sm"
+                                : "border border-[#e5ecdf] bg-white text-[#547d46] shadow-xs hover:border-[#b6cda8] hover:bg-[#f8fbf5]"
+                            }`}>
+                            {page}
+                          </button>
+                        </span>
+                      );
+                    })}
+
+                    {/* Next */}
+                    <button
+                      type="button"
+                      id="pagination-next"
+                      disabled={currentPage === totalPages}
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      aria-label="Next page"
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e5ecdf] bg-white text-[#547d46] shadow-xs transition hover:border-[#b6cda8] hover:bg-[#f8fbf5] disabled:cursor-not-allowed disabled:opacity-40">
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </nav>
+              )}
             </>
           ) : groceries.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[#c5d9b8] bg-[#f9fbf7] px-5 py-14 text-center">

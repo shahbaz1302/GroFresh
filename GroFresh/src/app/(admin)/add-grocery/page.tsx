@@ -94,7 +94,7 @@ const AddGrocery = () => {
       <div className="relative mx-auto max-w-2xl">
         <Link
           href="/"
-          className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#dce8d4] bg-white px-4 py-2.5 text-sm font-semibold text-[#547d46] shadow-sm transition hover:border-[#b6cda8] hover:bg-[#f8fbf5] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/60 md:fixed md:left-8 md:top-10 md:z-10 md:mb-0">
+          className="absolute top-4 -left-90 inline-flex items-center gap-2 rounded-full border border-[#dce8d4] bg-white px-4 py-2.5 text-sm font-semibold text-[#547d46] shadow-sm transition hover:border-[#b6cda8] hover:bg-[#f8fbf5] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/60">
           <ArrowLeft className="h-4 w-4" />
           Back to Home
         </Link>

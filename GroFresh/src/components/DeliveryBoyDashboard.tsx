@@ -452,11 +452,11 @@ const DeliveryBoyDashboard = ({ user }: DeliveryBoyDashboardProps) => {
       setOtpSending(true);
       setOtpError(null);
       setOtpValue("");
-      await axios.post("/api/deliveryBoy/otp/send", {
+      const res = await axios.post("/api/deliveryBoy/otp/send", {
         orderId: currentActive.orderId?._id,
       });
       setOtpDialogOpen(true);
-      toast.success("OTP sent to customer's phone!");
+      toast.success(res.data?.message || "OTP sent to customer's email!");
     } catch (error: any) {
       const msg =
         error.response?.data?.message || "Failed to send OTP. Try again.";
@@ -1411,7 +1411,7 @@ const DeliveryBoyDashboard = ({ user }: DeliveryBoyDashboardProps) => {
                   Delivery OTP Verification
                 </h2>
                 <p className="mt-1 text-xs font-medium text-white/75">
-                  An OTP has been sent to the customer&apos;s phone. Ask them
+                  An OTP has been sent to the customer&apos;s registered email. Ask them
                   for the code to confirm handover.
                 </p>
               </div>

@@ -46,21 +46,11 @@ type SortOption =
   | "name-desc";
 
 const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
-  const [activeSubCategory, setActiveSubCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("featured");
-
   const dispatch = useDispatch<AppDispatch>();
-  const { cartData, subTotal } = useSelector((state: RootState) => state.cart);
+  const { cartData } = useSelector((state: RootState) => state.cart);
 
   const currentCategory =
     category || groceries[0]?.category || GROCERY_CATEGORIES[0];
-
-  useEffect(() => {
-    setActiveSubCategory("all");
-    setSearchQuery("");
-    setSortBy("featured");
-  }, [category]);
 
   const categoryGroceries = useMemo(() => {
     return currentCategory
@@ -74,12 +64,9 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
     const storedSubcategories = categoryGroceries
       .filter(
         (grocery) =>
-          grocery.category === currentCategory &&
-          grocery.subCategory?.trim(),
+          grocery.category === currentCategory && grocery.subCategory?.trim(),
       )
-      .flatMap((grocery) =>
-        grocery.subCategory ? [grocery.subCategory] : [],
-      );
+      .flatMap((grocery) => (grocery.subCategory ? [grocery.subCategory] : []));
     const subcategoryValues = Array.from(
       new Set([
         ...configuredSubcategories.map((subcategory) => subcategory.value),
@@ -112,12 +99,36 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
     return subcategories;
   }, [currentCategory, categoryGroceries]);
 
+  const defaultSubCategory = availableSubcategories[0]?.value || "";
+
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
+    null,
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("featured");
+
+  const setActiveSubCategory = (subCat: string) => {
+    setSelectedSubCategory(subCat);
+  };
+
+  const activeSubCategory =
+    selectedSubCategory &&
+    availableSubcategories.some((s) => s.value === selectedSubCategory)
+      ? selectedSubCategory
+      : defaultSubCategory;
+
+  useEffect(() => {
+    setSelectedSubCategory(null);
+    setSearchQuery("");
+    setSortBy("featured");
+  }, [category]);
+
   const filteredGroceries = useMemo(() => {
     let result = categoryGroceries;
 
     if (activeSubCategory === "__uncategorized") {
       result = result.filter((grocery) => !grocery.subCategory?.trim());
-    } else if (activeSubCategory !== "all") {
+    } else if (activeSubCategory) {
       result = result.filter(
         (grocery) =>
           grocery.category === currentCategory &&
@@ -151,7 +162,13 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
     }
 
     return result;
-  }, [activeSubCategory, categoryGroceries, currentCategory, searchQuery, sortBy]);
+  }, [
+    activeSubCategory,
+    categoryGroceries,
+    currentCategory,
+    searchQuery,
+    sortBy,
+  ]);
 
   const cartQuantity = cartData.reduce(
     (total, item) => total + item.quantity,
@@ -163,12 +180,15 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
   };
 
   const handleResetFilters = () => {
-    setActiveSubCategory("all");
+    setSelectedSubCategory(null);
     setSearchQuery("");
     setSortBy("featured");
   };
 
-  const isFiltering = activeSubCategory !== "all" || searchQuery.trim() !== "";
+  const isFiltering =
+    (selectedSubCategory !== null &&
+      selectedSubCategory !== defaultSubCategory) ||
+    searchQuery.trim() !== "";
 
   return (
     <main className="min-h-screen bg-[#f4f8f0] px-3.5 py-5 font-sans text-[#183b2b] pb-24 sm:px-6 sm:py-8 md:pb-12 lg:px-8">
@@ -177,8 +197,11 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#dce8d4] bg-white px-3.5 py-2 text-xs font-semibold text-[#547d46] shadow-xs transition hover:border-[#b6cda8] hover:bg-[#f8fbf5] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/60 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
-            <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#dce8d4] bg-white px-3.5 py-2 text-xs font-semibold text-[#547d46] shadow-xs transition hover:border-[#b6cda8] hover:bg-[#f8fbf5] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/60 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
+            <ArrowLeft
+              aria-hidden="true"
+              className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+            />
             <span>Back to categories</span>
           </Link>
 
@@ -209,7 +232,10 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
               {filteredGroceries.length}{" "}
               {filteredGroceries.length === 1 ? "item" : "items"} available
               {categoryGroceries.length !== filteredGroceries.length && (
-                <span className="text-[#8c9f90]"> (of {categoryGroceries.length})</span>
+                <span className="text-[#8c9f90]">
+                  {" "}
+                  (of {categoryGroceries.length})
+                </span>
               )}
             </p>
           </div>
@@ -251,35 +277,16 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#7a9a67]">
                 Subcategories
               </span>
-              {activeSubCategory !== "all" && (
+              {isFiltering && (
                 <button
                   type="button"
-                  onClick={() => setActiveSubCategory("all")}
+                  onClick={handleResetFilters}
                   className="text-[11px] font-bold text-[#547d46] underline hover:text-[#385c2d]">
                   Reset
                 </button>
               )}
             </div>
             <div className="-mx-3.5 flex gap-1.5 overflow-x-auto px-3.5 pb-2 scrollbar-none sm:mx-0 sm:px-0">
-              <button
-                type="button"
-                onClick={() => setActiveSubCategory("all")}
-                aria-pressed={activeSubCategory === "all"}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  activeSubCategory === "all"
-                    ? "bg-[#284936] text-white shadow-xs font-semibold"
-                    : "border border-[#e2eadd] bg-white text-[#5d7063] hover:bg-[#f6f9f3]"
-                }`}>
-                <span>All</span>
-                <span
-                  className={`rounded-full px-1.5 py-0.2 text-[10px] ${
-                    activeSubCategory === "all"
-                      ? "bg-white/20 text-white"
-                      : "bg-[#eaf3e3] text-[#477739]"
-                  }`}>
-                  {categoryGroceries.length}
-                </span>
-              </button>
               {availableSubcategories.map((subcategory) => {
                 const isActive = activeSubCategory === subcategory.value;
                 return (
@@ -326,18 +333,11 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
               <nav
                 aria-label="Product subcategories"
                 className="flex max-h-[calc(100vh-10rem)] flex-col gap-1 overflow-y-auto pr-1 scrollbar-thin">
-                {[
-                  {
-                    name: "All items",
-                    value: "all",
-                    count: categoryGroceries.length,
-                  },
-                  ...availableSubcategories.map((subcategory) => ({
+                {availableSubcategories.map((subcategory) => ({
                     name: subcategory.label,
                     value: subcategory.value,
                     count: subcategory.count,
-                  })),
-                ].map((group) => (
+                  })).map((group) => (
                   <button
                     key={group.value}
                     type="button"
@@ -422,44 +422,54 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
                       <article
                         key={grocery.id}
                         className="group flex h-full flex-col overflow-hidden rounded-xl border border-[#e9eee5] bg-white transition duration-200 hover:-translate-y-0.5 hover:border-[#c5d9b8] hover:shadow-[0_12px_30px_-16px_rgba(24,59,43,0.28)] sm:rounded-2xl">
-                        <div className="relative aspect-square w-full overflow-hidden bg-[#f6f9f3]">
-                          <Image
-                            src={grocery.image}
-                            alt={grocery.name}
-                            fill
-                            sizes="(max-width: 640px) 48vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                            className="object-contain p-2.5 transition duration-300 group-hover:scale-105 sm:p-4"
-                          />
-                        </div>
-                        <div className="p-3 sm:p-4">
-                          <p className="mb-2 inline-flex max-w-full rounded-full bg-[#eef5e8] px-2.5 py-1 text-[10px] font-semibold text-[#547d46] sm:text-[11px]">
-                            <span className="truncate">{grocery.category}</span>
-                          </p>
-                          <p className="mb-1 truncate text-xs font-medium text-[#82967b]">
-                            {getSubcategoryLabel(
-                              grocery.category,
-                              grocery.subCategory,
-                            )}
-                          </p>
-                          <h2 className="truncate text-sm font-bold text-[#183b2b] sm:text-base">
-                            {grocery.name}
-                          </h2>
-                          <div className="mt-3 flex flex-wrap items-baseline justify-between gap-1">
-                            <p className="text-base font-extrabold text-[#3f6535] sm:text-lg">
-                              ₹
-                              {grocery.price.toLocaleString("en-IN", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </p>
-                            <p className="text-xs font-medium text-[#82967b]">
-                              per {grocery.unit}
-                            </p>
+                        {/* Clickable image + info area */}
+                        <Link
+                          href={`/product/${grocery.id}`}
+                          className="flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#a9c68f]"
+                          aria-label={`View details for ${grocery.name}`}>
+                          <div className="relative aspect-square w-full overflow-hidden bg-[#f6f9f3]">
+                            <Image
+                              src={grocery.image}
+                              alt={grocery.name}
+                              fill
+                              sizes="(max-width: 640px) 48vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                              className="object-contain p-2.5 transition duration-300 group-hover:scale-105 sm:p-4"
+                            />
                           </div>
+                          <div className="px-3 pt-3 sm:px-4 sm:pt-4">
+                            <p className="mb-2 inline-flex max-w-full rounded-full bg-[#eef5e8] px-2.5 py-1 text-[10px] font-semibold text-[#547d46] sm:text-[11px]">
+                              <span className="truncate">{grocery.category}</span>
+                            </p>
+                            <p className="mb-1 truncate text-xs font-medium text-[#82967b]">
+                              {getSubcategoryLabel(
+                                grocery.category,
+                                grocery.subCategory,
+                              )}
+                            </p>
+                            <h2 className="truncate text-sm font-bold text-[#183b2b] sm:text-base">
+                              {grocery.name}
+                            </h2>
+                            <div className="mt-2 flex flex-wrap items-baseline justify-between gap-1">
+                              <p className="text-base font-extrabold text-[#3f6535] sm:text-lg">
+                                ₹
+                                {grocery.price.toLocaleString("en-IN", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </p>
+                              <p className="text-xs font-medium text-[#82967b]">
+                                per {grocery.unit}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                        {/* Cart controls – stop propagation so clicks don't navigate */}
+                        <div className="px-3 pb-3 sm:px-4 sm:pb-4">
                           {quantity === 0 ? (
                             <button
                               type="button"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 dispatch(
                                   setCartData({
                                     _id: grocery.id,
@@ -473,23 +483,24 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
                                 );
                               }}
                               aria-label={`Add ${grocery.name} to cart`}
-                              className="mt-3 w-full rounded-lg border border-[#76a85b] bg-[#f5faef] px-3 py-2 text-sm font-bold text-[#3f6535] transition hover:bg-[#eaf3e3] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/60">
+                              className="mt-2 w-full rounded-lg border border-[#76a85b] bg-[#f5faef] px-3 py-2 text-sm font-bold text-[#3f6535] transition hover:bg-[#eaf3e3] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#dcebd0]/60">
                               Add to cart
                             </button>
                           ) : (
                             <div
                               aria-label={`${grocery.name}, quantity ${quantity}`}
-                              className="mt-3 flex items-center justify-between rounded-lg bg-[#547d46] text-white">
+                              className="mt-2 flex items-center justify-between rounded-lg bg-[#547d46] text-white">
                               <button
                                 type="button"
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   dispatch(
                                     updateCartQuantity({
                                       groceryId: grocery.id,
                                       change: -1,
                                     }),
-                                  )
-                                }
+                                  );
+                                }}
                                 aria-label={`Remove one ${grocery.name}`}
                                 className="flex h-9 w-10 items-center justify-center rounded-l-lg text-lg font-bold transition hover:bg-[#3f6535] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white">
                                 −
@@ -501,14 +512,15 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
                               </span>
                               <button
                                 type="button"
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   dispatch(
                                     updateCartQuantity({
                                       groceryId: grocery.id,
                                       change: 1,
                                     }),
-                                  )
-                                }
+                                  );
+                                }}
                                 aria-label={`Add one ${grocery.name}`}
                                 className="flex h-9 w-10 items-center justify-center rounded-r-lg text-lg font-bold transition hover:bg-[#3f6535] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white">
                                 +
@@ -528,9 +540,12 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
                   />
                   <h2 className="mt-4 text-lg font-bold">
                     No{" "}
-                    {activeSubCategory === "all"
-                      ? "matching"
-                      : getSubcategoryLabel(currentCategory, activeSubCategory).toLocaleLowerCase()}{" "}
+                    {activeSubCategory
+                      ? getSubcategoryLabel(
+                          currentCategory,
+                          activeSubCategory,
+                        ).toLocaleLowerCase()
+                      : "matching"}{" "}
                     items found
                   </h2>
                   <p className="mt-1 text-sm text-[#82967b]">
