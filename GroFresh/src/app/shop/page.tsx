@@ -2,7 +2,10 @@ import { auth } from "@/auth";
 import GroceryItems from "@/components/GroceryItemCard";
 import Navbar from "@/components/Navbar";
 import connectDB from "@/lib/db";
-import { GROCERY_CATEGORIES } from "@/lib/grocery-categories";
+import {
+  GROCERY_CATEGORIES,
+  normalizeGroceryCategory,
+} from "@/lib/grocery-categories";
 import groceryModel from "@/models/grocery.model";
 import userModel from "@/models/user.model";
 import { redirect } from "next/navigation";
@@ -47,17 +50,28 @@ const ShopContent = async ({ searchParams }: ShopPageProps) => {
   }
 
   const query = await searchParams;
-  let category =
+  const rawCategory =
     typeof query.category === "string" ? query.category : undefined;
+  const normalizedCategory = normalizeGroceryCategory(rawCategory);
 
-  if (!category) {
+  if (!normalizedCategory) {
     const firstGrocery = await groceryModel.findOne({}, { category: 1 }).lean();
-    const defaultCategory = firstGrocery?.category || GROCERY_CATEGORIES[0];
+    const defaultCategory =
+      normalizeGroceryCategory(firstGrocery?.category) || GROCERY_CATEGORIES[0];
     redirect(`/shop?category=${encodeURIComponent(defaultCategory)}`);
   }
 
+  if (rawCategory !== normalizedCategory) {
+    redirect(`/shop?category=${encodeURIComponent(normalizedCategory)}`);
+  }
+
+  const category = normalizedCategory;
+  const escapedCategory = category.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
   const groceries = await groceryModel
-    .find({ category })
+    .find({
+      category: { $regex: new RegExp(`^${escapedCategory}$`, "i") },
+    })
     .sort({ name: 1 })
     .lean();
 
@@ -69,7 +83,8 @@ const ShopContent = async ({ searchParams }: ShopPageProps) => {
         groceries={groceries.map((grocery) => ({
           id: grocery._id.toString(),
           name: grocery.name,
-          category: grocery.category,
+          category:
+            normalizeGroceryCategory(grocery.category) || grocery.category,
           subCategory: grocery.subCategory,
           image: grocery.image,
           price: grocery.price,

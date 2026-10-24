@@ -10,6 +10,7 @@ import {
   getSubcategoryLabel,
   GROCERY_CATEGORIES,
   GroceryCategory,
+  normalizeGroceryCategory,
 } from "@/lib/grocery-categories";
 import {
   ArrowLeft,
@@ -50,11 +51,19 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
   const { cartData } = useSelector((state: RootState) => state.cart);
 
   const currentCategory =
-    category || groceries[0]?.category || GROCERY_CATEGORIES[0];
+    normalizeGroceryCategory(category) ||
+    normalizeGroceryCategory(groceries[0]?.category) ||
+    category ||
+    groceries[0]?.category ||
+    GROCERY_CATEGORIES[0];
 
   const categoryGroceries = useMemo(() => {
     return currentCategory
-      ? groceries.filter((g) => g.category === currentCategory)
+      ? groceries.filter(
+          (g) =>
+            g.category.trim().toLowerCase() ===
+            currentCategory.trim().toLowerCase(),
+        )
       : groceries;
   }, [groceries, currentCategory]);
 
@@ -64,7 +73,9 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
     const storedSubcategories = categoryGroceries
       .filter(
         (grocery) =>
-          grocery.category === currentCategory && grocery.subCategory?.trim(),
+          grocery.category.trim().toLowerCase() ===
+            currentCategory.trim().toLowerCase() &&
+          grocery.subCategory?.trim(),
       )
       .flatMap((grocery) => (grocery.subCategory ? [grocery.subCategory] : []));
     const subcategoryValues = Array.from(
@@ -79,7 +90,8 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
       label: getSubcategoryLabel(currentCategory, subCategory),
       count: categoryGroceries.filter(
         (grocery) =>
-          grocery.category === currentCategory &&
+          grocery.category.trim().toLowerCase() ===
+            currentCategory.trim().toLowerCase() &&
           grocery.subCategory === subCategory,
       ).length,
     }));
@@ -131,7 +143,8 @@ const GroceryItems = ({ category, groceries }: GroceryItemsProps) => {
     } else if (activeSubCategory) {
       result = result.filter(
         (grocery) =>
-          grocery.category === currentCategory &&
+          grocery.category.trim().toLowerCase() ===
+            currentCategory.trim().toLowerCase() &&
           grocery.subCategory === activeSubCategory,
       );
     }

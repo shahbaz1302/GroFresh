@@ -160,42 +160,42 @@ const Footer = () => {
             <ul className="mt-4 space-y-2.5 text-xs font-semibold text-[#546e5a]">
               <li>
                 <Link
-                  href="/shop?category=Fruits%20%26%20vegetables"
+                  href="/shop?category=Fruits%20%26%20Vegetables"
                   className="transition hover:text-[#2d5624] hover:underline">
                   Fruits & Vegetables
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/shop?category=Dairy%2C%20bread%20%26%20eggs"
+                  href="/shop?category=Dairy%2C%20Bread%20%26%20Eggs"
                   className="transition hover:text-[#2d5624] hover:underline">
                   Dairy, Bread & Eggs
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/shop?category=Snacks%20%26%20munchies"
+                  href="/shop?category=Snacks%20%26%20Munchies"
                   className="transition hover:text-[#2d5624] hover:underline">
                   Snacks & Munchies
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/shop?category=Cold%20drinks"
+                  href="/shop?category=Cold%20Drinks%20%26%20Beverages"
                   className="transition hover:text-[#2d5624] hover:underline">
                   Cold Drinks & Juices
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/shop?category=Rice%2C%20atta%20%26%20dals"
+                  href="/shop?category=Rice%2C%20Atta%20%26%20Dals"
                   className="transition hover:text-[#2d5624] hover:underline">
                   Rice, Atta & Dals
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/shop?category=Instant%20food"
+                  href="/shop?category=Instant%20Food"
                   className="transition hover:text-[#2d5624] hover:underline">
                   Instant Food
                 </Link>

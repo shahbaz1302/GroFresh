@@ -3,65 +3,66 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { GroceryCategory } from "@/lib/grocery-categories";
 
-const categories = [
+const categories: { name: GroceryCategory; image: string }[] = [
   {
-    name: "Fruits & vegetables",
+    name: "Fruits & Vegetables",
     image:
       "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Dairy, bread & eggs",
+    name: "Dairy, Bread & Eggs",
     image:
       "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Snacks & munchies",
+    name: "Snacks & Munchies",
     image:
       "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Cold drinks",
+    name: "Cold Drinks & Beverages",
     image:
       "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Rice, atta & dals",
+    name: "Rice, Atta & Dals",
     image:
       "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Masala & cooking",
+    name: "Masala & Cooking",
     image:
       "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Breakfast & sauces",
+    name: "Breakfast & Sauces",
     image:
       "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Instant food",
+    name: "Instant Food",
     image:
       "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Beauty & personal care",
+    name: "Beauty & Personal Care",
     image:
       "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Home & cleaning",
+    name: "Home & Cleaning",
     image:
       "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Baby care",
+    name: "Baby Care",
     image:
       "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=500&q=80",
   },
   {
-    name: "Pet supplies",
+    name: "Pet Supplies",
     image:
       "https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=500&q=80",
   },

@@ -121,6 +121,41 @@ export function isGroceryCategory(value: string): value is GroceryCategory {
   return GROCERY_CATEGORIES.some((category) => category === value);
 }
 
+export function normalizeGroceryCategory(
+  value?: string | null,
+): GroceryCategory | null {
+  if (!value || typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  // Exact match
+  const exact = GROCERY_CATEGORIES.find((cat) => cat === trimmed);
+  if (exact) return exact;
+
+  // Case-insensitive match
+  const caseInsensitive = GROCERY_CATEGORIES.find(
+    (cat) => cat.toLowerCase() === trimmed.toLowerCase(),
+  );
+  if (caseInsensitive) return caseInsensitive;
+
+  const lower = trimmed.toLowerCase();
+
+  // Alias checks (e.g. "Cold drinks" -> "Cold Drinks & Beverages")
+  if (lower.includes("cold drink")) {
+    return "Cold Drinks & Beverages";
+  }
+
+  // Prefix or partial match
+  const partial = GROCERY_CATEGORIES.find(
+    (cat) =>
+      cat.toLowerCase().startsWith(lower) ||
+      lower.startsWith(cat.toLowerCase()),
+  );
+  if (partial) return partial;
+
+  return null;
+}
+
 export function isSubcategoryForCategory(
   category: GroceryCategory,
   subcategory: string,
