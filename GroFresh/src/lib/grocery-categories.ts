@@ -81,13 +81,11 @@ export const CATEGORY_SUBCATEGORIES: Record<
   "Instant Food": [
     { value: "instantfood", label: "Instant Food" },
     { value: "noodles-pasta", label: "Noodles & Pasta" },
-    { value: "ready-to-eat", label: "Ready to Eat" },
+    { value: "popcorn", label: "Popcorn" },
     { value: "soups", label: "Soups" },
     { value: "frozen-food", label: "Frozen Food" },
-    { value: "instant-mixes", label: "Instant Mixes" },
   ],
   "Beauty & Personal Care": [
-    { value: "beauty", label: "Beauty" },
     { value: "personalcare", label: "Personal Care" },
     { value: "skin-care", label: "Skin Care" },
     { value: "hair-care", label: "Hair Care" },
@@ -95,7 +93,6 @@ export const CATEGORY_SUBCATEGORIES: Record<
     { value: "oral-care", label: "Oral Care" },
   ],
   "Home & Cleaning": [
-    { value: "home", label: "Home Essentials" },
     { value: "cleaning", label: "Cleaning Supplies" },
     { value: "laundry", label: "Laundry" },
     { value: "dishwashing", label: "Dishwashing" },
